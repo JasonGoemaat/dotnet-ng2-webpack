@@ -1,0 +1,32 @@
+// path for bootstrap and font-awesome fonts
+$icon-font-path: 'assets/fonts/';
+$fa-font-path: 'assets/fonts/';
+
+// bootstrap variables
+$grid-columns: 16;
+$grid-gutter-width: 10;
+
+// nice looking font for bootstrap
+$font-family-sans-serif: -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
+
+// custom danger background to be darker than spacelab:
+$btn-danger-bg: darken(#CD0200, 5%); // spacelab #CD0200
+
+// bootswatch spacelab theme variables (before bootstrap)
+@import '../node_modules/bootswatch/spacelab/_variables.scss';
+
+// now bootstrap proper
+@import '../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap';
+
+// and overriding styles from bootswatch
+@import '../node_modules/bootswatch/spacelab/_bootswatch.scss';
+
+// now add font-awesome styles
+@import '../node_modules/font-awesome/scss/font-awesome';
+
+$my-background: #80b4e0;
+$my-color: red;
+
+h1 { background-color: $my-background; }
+
+h2 { color: $my-color; }

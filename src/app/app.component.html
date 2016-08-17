@@ -1,0 +1,44 @@
+<h1>app.component.html file!</h1>
+
+<p>
+That heading should be green text (from src/app/app.component.scss) and blue
+    background (from src/me.scss) 
+</p>
+
+<!-- uncomment this to show Wijmo control, see README.md
+<p>WjInputDateTime: <wj-input-date-time [(value)]="date"></wj-input-date-time></p>
+-->
+
+<p>
+    Now we're using webpack@beta (webpack 2), and awesome-typescript-loader as
+    well as angular2-template-loader so we can use files in components without
+    using require(). 
+</p>
+
+<p>
+    Bootstrap Glyphicons?: <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+</p>
+
+<p>
+    Font-Awesome icons?: <span class="fa fa-check-circle" aria-hidden="true"></span>
+</p>
+
+<p>
+    Spacelab Buttons?  Success is light green, warning is Orange:
+    <button class="btn btn-sm btn-success" (click)="message = 'Success'">Success</button>
+    <button class="btn btn-sm btn-warning" (click)="message = 'Warning'">Warning</button>
+</p>
+
+<p>Message: {{message}}</p>
+
+<p>Message from service:  <span id="serviceMessage">Message <strong><em>will be replaced</em></strong> by jquery</span></p>
+
+<p>List of strings, using lodash to modify:</p>
+<ul>
+    <li *ngFor="let s of strings">{{s}}</li>
+</ul>
+
+<p>Result of calling "/api/values":</p>
+<ul>
+    <li *ngFor="let v of values">{{v}}</li>
+</ul>
