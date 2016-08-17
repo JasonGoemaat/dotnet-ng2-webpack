@@ -7,10 +7,14 @@ var OccurrenceOrderPlugin = require("webpack/lib/optimize/OccurrenceOrderPlugin"
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
 module.exports = {
+    debug: true,
+    cache: true,
+    
     // possibly check out code splitting: https://webpack.github.io/docs/code-splitting.html
     entry: {
         "app": ["./src/main.ts"],
-        "vendor": ["./src/scripts.ts"],
+        "vendor": ["./src/vendor.ts"],
+        "polyfills": ["./src/polyfills.ts"],
         "css": ["./src/main.scss"],
     },
 
@@ -104,7 +108,7 @@ module.exports = {
 
         // to split common code into a vendor chunk
         new CommonsChunkPlugin({
-            name: ["vendor"]
+            name: ["polyfills", "vendor"].reverse()
         }),
 
         // ignore paths we include bundles from
@@ -112,7 +116,10 @@ module.exports = {
         //new webpack.IgnorePlugin(/rxjs/),
         
         // copy index file and insert script tags for bundles
-        new HtmlWebpackPlugin({ template: './src/index.html' }),
+        new HtmlWebpackPlugin({
+            template: './src/index.html',
+            chunksSortMode: 'dependency'
+        }),
 
         // define our environment to use in our code        
         new webpack.DefinePlugin({ app: {
@@ -137,6 +144,14 @@ module.exports = {
                 from: 'node_modules/font-awesome/fonts/*',
                 to: 'assets/fonts',
                 flatten: true            },
+            { // jquery
+                from: 'node_modules/jquery/dist/jquery.min.js',
+                flatten: true
+            },
+            { // lodash
+                from: 'node_modules/lodash/lodash.min.js',
+                flatten: true
+            },
         ]),
 
     ],

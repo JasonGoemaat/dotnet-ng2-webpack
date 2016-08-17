@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
     message: string = "Hello, world!  I am the AppComponent";
     strings: string[];
     values: string[];
-    a: number = 1;
+    a: number = 5;
 
     constructor(public messageService: MessageService) {
         this.strings = ['hello', 'world', 'from', 'AppComponent'];
