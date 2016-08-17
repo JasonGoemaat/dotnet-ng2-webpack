@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+var OccurrenceOrderPlugin = require("webpack/lib/optimize/OccurrenceOrderPlugin");
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
 module.exports = {
@@ -10,11 +11,20 @@ module.exports = {
     entry: {
         "app": ["./src/main.ts"],
         "vendor": ["./src/scripts.ts"],
-        "css": ["./src/css.ts"],
+        "css": ["./src/main.scss"],
     },
-    output: { path: './wwwroot', filename: '[name].bundle.js' },
 
-    //root: 'src',
+    output: {
+        path: './wwwroot',
+        filename: '[name].bundle.js',
+        sourceMapFilename: '[name].map',
+        chunkFilename: '[id].chunk.js',
+        library: 'ac_[name]',
+        libraryTarget: 'var',
+    },
+
+    root: path.resolve(__dirname, 'src'),
+    
     modulesDirectories: ['node_modules'],
 
     module: {
@@ -24,15 +34,24 @@ module.exports = {
         // use source-map-loader, but only for our app
         preLoaders: [
             {
+                test: /\.ts/,
+                loader: "source-map-loader",
                 include: /src\/app/,
                 exclude: /node_modules/,
-                loader: "source-map-loader"
-            }
+            },
+            {
+                // per angular2-webpack-starter, some packages have problems with sourcemaps
+                test: /\.js/,
+                loader: "source-map-loader",
+                exclude: [
+                    path.resolve(__dirname, 'node_modules')
+                ],
+            },
         ],
         loaders: [
             // special loaders for angular templates
             { test: /\.ts$/, exclude: /node_modules/, loaders: ['awesome-typescript-loader', 'angular2-template-loader'] },
-            { test: /\.html$/, loader: 'raw' }, // for templates, need 'raw'
+            { test: /\.html$/, loader: 'raw', exclude: /index.html/ }, // for templates, need 'raw'
             { test: /\.css$/, loader: 'raw', exclude: /node_modules/ }, // for templates, need 'raw'
             { test: /\.scss$/, include: /src\/app/, loaders: ['raw', "sass"] }, // for templates, need 'raw'
             
@@ -52,8 +71,9 @@ module.exports = {
     },
     
     resolve: {
-        extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
-            '.min.css', '.sass', '.scss'],
+        // extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
+        //     '.min.css', '.sass', '.scss'],
+        extensions: ['', '.ts', '.js', '.json'],
         //exclude: [ /node_modules/, /rxjs/ ],
         
         // ----- naive try to get it to use precompiled rx bundle
@@ -65,18 +85,31 @@ module.exports = {
     plugins: [
         // list: https://github.com/webpack/docs/wiki/list-of-plugins
 
+
+        // https://github.com/s-panferov/awesome-typescript-loader
+        // Does type checking in a separate process to typescript doesn't have
+        // to wait, 'Significantly' improves development workflow with tools
+        // like react-hot-loader
+        new ForkCheckerPlugin(),
+
+        /*
+        * Plugin: OccurenceOrderPlugin
+        * Description: Varies the distribution of the ids to get the smallest id length
+        * for often used ids.
+        *
+        * See: https://webpack.github.io/docs/list-of-plugins.html#occurrenceorderplugin
+        * See: https://github.com/webpack/docs/wiki/optimization#minimize
+        */
+        new OccurrenceOrderPlugin(true),
+
         // to split common code into a vendor chunk
         new CommonsChunkPlugin({
-            name: "vendor"
+            name: ["vendor"]
         }),
 
         // ignore paths we include bundles from
         // http://stackoverflow.com/questions/34907841/how-to-make-webpack-exclude-angular2-modules
         //new webpack.IgnorePlugin(/rxjs/),
-
-        // make commonly used modules with lower ids, save space?   doesn't
-        // seem like 1347 -> 5 will save a lot of space to me...  preferEntry
-        new webpack.optimize.OccurrenceOrderPlugin(true), // preferEntry
         
         // copy index file and insert script tags for bundles
         new HtmlWebpackPlugin({ template: './src/index.html' }),
@@ -106,11 +139,6 @@ module.exports = {
                 flatten: true            },
         ]),
 
-        // https://github.com/s-panferov/awesome-typescript-loader
-        // Does type checking in a separate process to typescript doesn't have
-        // to wait, 'Significantly' improves development workflow with tools
-        // like react-hot-loader
-        new ForkCheckerPlugin(),
     ],
 
     // sass config - not really using
