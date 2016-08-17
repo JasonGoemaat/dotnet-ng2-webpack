@@ -2,9 +2,11 @@
 import '@angular/core';
 import '@angular/common';
 import '@angular/http';
-import '@angular/core';
+import '@angular/compiler';
 import '@angular/platform-browser-dynamic';
 import 'rxjs';
+
+import 'rxjs/add/operator/map';
 
 // Wijmo styles and scripts (not *.angular2 modules)
 // require('style!css!../node_modules/wijmo/styles/wijmo.min.css');

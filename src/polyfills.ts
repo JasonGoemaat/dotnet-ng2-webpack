@@ -6,8 +6,8 @@
 
 // lodash and jquery libraries
 // NOTE: these moved to CopyWebpackPlugin and loaded in index.html
-// require('script!../node_modules/jquery/dist/jquery.min.js');
-// require('script!../node_modules/lodash/lodash.min.js');
+require('script!../node_modules/jquery/dist/jquery.min.js');
+require('script!../node_modules/lodash/lodash.min.js');
 
 
 // ----- version straight from angular2-webpack-starter:

@@ -5,6 +5,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var OccurrenceOrderPlugin = require("webpack/lib/optimize/OccurrenceOrderPlugin");
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+var AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
 module.exports = {
     debug: true,
@@ -21,10 +22,10 @@ module.exports = {
     output: {
         path: './wwwroot',
         filename: '[name].bundle.js',
-        sourceMapFilename: '[name].map',
+        //sourceMapFilename: '[name].map',
         chunkFilename: '[id].chunk.js',
-        library: 'ac_[name]',
-        libraryTarget: 'var',
+        // library: 'ac_[name]',
+        // libraryTarget: 'var',
     },
 
     root: path.resolve(__dirname, 'src'),
@@ -37,20 +38,20 @@ module.exports = {
 
         // use source-map-loader, but only for our app
         preLoaders: [
-            {
-                test: /\.ts/,
-                loader: "source-map-loader",
-                include: /src\/app/,
-                exclude: /node_modules/,
-            },
-            {
-                // per angular2-webpack-starter, some packages have problems with sourcemaps
-                test: /\.js/,
-                loader: "source-map-loader",
-                exclude: [
-                    path.resolve(__dirname, 'node_modules')
-                ],
-            },
+            // {
+            //     test: /\.ts$/,
+            //     loader: "source-map-loader",
+            //     include: /src\/app/,
+            //     exclude: /node_modules/,
+            // },
+            // {
+            //     // per angular2-webpack-starter, some packages have problems with sourcemaps
+            //     test: /\.js/,
+            //     loader: "source-map-loader",
+            //     exclude: [
+            //         path.resolve(__dirname, 'node_modules')
+            //     ],
+            // },
         ],
         loaders: [
             // special loaders for angular templates
@@ -75,10 +76,10 @@ module.exports = {
     },
     
     resolve: {
-        // extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
-        //     '.min.css', '.sass', '.scss'],
-        extensions: ['', '.ts', '.js', '.json'],
-        //exclude: [ /node_modules/, /rxjs/ ],
+        extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
+            '.min.css', '.sass', '.scss'],
+        // extensions: ['', '.ts', '.js', '.json'],
+        exclude: [ /node_modules/ ],
         
         // ----- naive try to get it to use precompiled rx bundle
         // alias: {
@@ -120,6 +121,11 @@ module.exports = {
             template: './src/index.html',
             chunksSortMode: 'dependency'
         }),
+        new AddAssetHtmlPlugin([
+            { filepath: require.resolve('./wwwroot/other.dll.js'), includeSourcemap: false },
+            { filepath: require.resolve('./wwwroot/rxjs.dll.js'), includeSourcemap: false  },
+            { filepath: require.resolve('./wwwroot/angular.dll.js'), includeSourcemap: false  },
+        ]),
 
         // define our environment to use in our code        
         new webpack.DefinePlugin({ app: {
@@ -130,9 +136,9 @@ module.exports = {
         // copy various things, including fonts for bootstrap glyphicons and
         // font-awesome, as well as anything we put in src/public
         new CopyWebpackPlugin([
-            { // copy rxjs bundle
-                from: 'node_modules/rxjs/bundles/Rx.umd.min.js'
-            },
+            // { // copy rxjs bundle
+            //     from: 'node_modules/rxjs/bundles/Rx.umd.min.js'
+            // },
             { // copy all contents of 'public' folder over
                 from: 'src/public'
             },
@@ -153,6 +159,19 @@ module.exports = {
                 flatten: true
             },
         ]),
+
+        new webpack.DllReferencePlugin({
+            context: '.',
+            manifest: require('./wwwroot/angular-manifest.json')
+        }),
+        new webpack.DllReferencePlugin({
+            context: '.',
+            manifest: require('./wwwroot/rxjs-manifest.json')
+        }),
+        new webpack.DllReferencePlugin({
+            context: '.',
+            manifest: require('./wwwroot/other-manifest.json')
+        }),
 
     ],
 

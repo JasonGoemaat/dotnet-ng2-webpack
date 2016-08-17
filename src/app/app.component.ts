@@ -5,6 +5,9 @@ import { Component, OnInit } from '@angular/core';
 
 import { MessageService } from './services';
 
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+
 
 @Component({
     selector: 'my-app',
