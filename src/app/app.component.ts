@@ -10,14 +10,14 @@ import { MessageService } from './services';
     selector: 'my-app',
     // uncomment next line to use Wijmo control
     //directives: [WjInputDateTime],
-    styleUrls: ['app.component.scss'],
+    styleUrls: ['app.component.css'],
     templateUrl: 'app.component.html'
 })
 export class AppComponent implements OnInit {
     message: string = "Hello, world!  I am the AppComponent";
     strings: string[];
     values: string[];
-    a: number = 2;
+    a: number = 5;
 
     constructor(public messageService: MessageService) {
         this.strings = ['hello', 'world', 'from', 'AppComponent'];

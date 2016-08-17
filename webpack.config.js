@@ -4,13 +4,15 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+var AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 
 module.exports = {
     // possibly check out code splitting: https://webpack.github.io/docs/code-splitting.html
     entry: {
         "app": ["./src/main.ts"],
-        "vendor": ["./src/scripts.ts"],
-        "css": ["./src/css.ts"],
+        //"polyfills": ["./src/polyfills.ts"],
+        //"vendor": ["./src/scripts.ts"],
+        //"css": ["./src/main.scss"],
     },
     output: { path: './wwwroot', filename: '[name].bundle.js' },
 
@@ -34,28 +36,31 @@ module.exports = {
             { test: /\.ts$/, exclude: /node_modules/, loaders: ['awesome-typescript-loader', 'angular2-template-loader'] },
             { test: /\.html$/, loader: 'raw' }, // for templates, need 'raw'
             { test: /\.css$/, loader: 'raw', exclude: /node_modules/ }, // for templates, need 'raw'
-            { test: /\.scss$/, include: /src\/app/, loaders: ['raw', "sass"] }, // for templates, need 'raw'
+            //{ test: /\.scss$/, include: /src\/app/, loaders: ['raw', "sass"] }, // for templates, need 'raw'
             
             // loader for separate sass 'scss' files to compile them to css
-            { test: /\.scss$/,
-                exclude: /src\/app/,
-                loaders: [
-                    {
-                        loader: 'file',
-                        query: {
-                            name: '[name].css'
-                        }
-                    }, 'extract', 'css?-url', 'sass' // compile with sass, then css, then extract to file
-                ] 
-            }
+            // { test: /\.scss$/,
+            //     exclude: /src\/app/,
+            //     loaders: [
+            //         {
+            //             loader: 'file',
+            //             query: {
+            //                 name: '[name].css'
+            //             }
+            //         }, 'extract', 'css?-url', 'sass' // compile with sass, then css, then extract to file
+            //     ] 
+            // }
         ]
     },
     
     resolve: {
-        extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
-            '.min.css', '.sass', '.scss'],
+        // extensions: ['', '.js', '.ts', '.html', '.css', '.min.js', 
+        //     '.min.css', '.sass', '.scss'],
         //exclude: [ /node_modules/, /rxjs/ ],
-        
+
+        // minimize what we do
+        extensions: ['', '.ts', '.js']
+
         // ----- naive try to get it to use precompiled rx bundle
         // alias: {
         //     'rxjs': "/node_modules/rxjs/bundles/Rx.umd.min.js"
@@ -66,9 +71,9 @@ module.exports = {
         // list: https://github.com/webpack/docs/wiki/list-of-plugins
 
         // to split common code into a vendor chunk
-        new CommonsChunkPlugin({
-            name: "vendor"
-        }),
+        // new CommonsChunkPlugin({
+        //     name: ["vendor", "polyfills"]
+        // }),
 
         // ignore paths we include bundles from
         // http://stackoverflow.com/questions/34907841/how-to-make-webpack-exclude-angular2-modules
@@ -80,6 +85,13 @@ module.exports = {
         
         // copy index file and insert script tags for bundles
         new HtmlWebpackPlugin({ template: './src/index.html' }),
+        new AddAssetHtmlPlugin([
+            { filepath: require.resolve('./wwwroot/vendor.dll.js'), includeSourcemap: false },
+        ]),
+        new webpack.DllReferencePlugin({
+            context: '.',
+            manifest: require('./wwwroot/vendor-manifest.json')
+        }),
 
         // define our environment to use in our code        
         new webpack.DefinePlugin({ app: {
